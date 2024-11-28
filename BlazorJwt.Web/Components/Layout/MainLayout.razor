@@ -1,0 +1,60 @@
+﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+@if (isAuthenticated)
+{
+    <div class="page">
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+
+        <main>
+            <div class="top-row px-4">
+                <div>@userName (権限 @userRole)</div>
+                <a href="/logout">LogOut</a>
+            </div>
+
+            <article class="content px-4">
+                @Body
+            </article>
+        </main>
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+}
+
+@code {
+    private bool isAuthenticated { get; set; }
+    private string? userName;
+    private string? userRole;
+
+    // すべてのページリクエスト時に認証状態を確認し、未認証ならログインページへリダイレクト
+    protected override async Task OnInitializedAsync()
+    {
+        // 認証状態を取得
+        var authState = await ((CustomAuthStateProvider)AuthStateProvider).GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // 未認証ならログインページへリダイレクト
+        if (user.Identity?.IsAuthenticated != true)
+        {
+            Navigation.NavigateTo("/login");
+        }
+
+        // ----------------- 以下認証済みの場合 -----------------
+        isAuthenticated = true;
+
+        //ユーザー名
+        userName = user.Identity?.Name;
+        //ロール
+        var roleClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+        userRole = roleClaim?.Value ?? "No Role";
+    }
+}

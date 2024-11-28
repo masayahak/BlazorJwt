@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Start",
+    "Projects": [
+      {
+        "Path": "BlazorJwt.Web\\BlazorJwt.Web.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "BlazorJwt.Api\\BlazorJwt.Api.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

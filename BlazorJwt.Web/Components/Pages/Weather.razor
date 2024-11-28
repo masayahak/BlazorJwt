@@ -1,0 +1,82 @@
+﻿@page "/weather"
+@using BlazorJwt.Api.Models
+@rendermode InteractiveServer
+@inject ApiClient ApiClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+
+@* 認可状態を判定するサンプル *@
+<AuthorizeView>
+    <Authorized>
+        <p>@context.User.Identity?.Name として認可されています</p>
+    </Authorized>
+    <NotAuthorized>
+        <p>認可されていません</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@* 認証ユーザーロールに基づき判定するサンプル *@
+<AuthorizeView Roles="admin">
+    <p>権限:adminは @ROW_COUNT_ADMIN 件の天気予報を表示します。</p>
+</AuthorizeView>
+<AuthorizeView Roles="user">
+    <p>権限:userは @ROW_COUNT_USER 件の天気予報を表示します。</p>
+</AuthorizeView>
+
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private WeatherModel[]? forecasts;
+
+    private const int ROW_COUNT_ADMIN = 100;
+    private const int ROW_COUNT_USER = 5;
+
+    protected override async Task OnInitializedAsync()
+    {        
+        // 認証状態を取得
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        // ロール
+        var isAdmin = authState.User.IsInRole("admin");
+        var isUser = authState.User.IsInRole("user");
+        var rowCount = isAdmin ? ROW_COUNT_ADMIN : isUser ? ROW_COUNT_USER : 0;
+
+        // WebAPIコール
+        forecasts = await ApiClient.PostAsync<WeatherModel[], int>("/api/weather/all", rowCount);
+
+    }
+
+}
