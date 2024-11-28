@@ -34,11 +34,17 @@
     private LoginModel loginModel = new LoginModel();
     private async Task HandleLogin()
     {
+        // ログイン用WebAPI呼び出し
         var token = await ApiClient.PostAsync<string, LoginModel>("/api/auth/login", loginModel);
+
         if (token != null)
         {
             await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(token);
             Navigation.NavigateTo("/");
+        }
+        else 
+        {
+            // ログイン失敗
         }
     }
 }

@@ -10,10 +10,12 @@ namespace BlazorJwt.Web.Auth
     // AuthenticationStateProviderを継承することで、
     // Blazor特有の<AuthorizeView>タグなのに対応させる。
     // ============================================================
-    public class CustomAuthStateProvider(ProtectedLocalStorage localStorage) : AuthenticationStateProvider
+    public class CustomAuthStateProvider(ProtectedLocalStorage localStorage) 
+        : Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider
     {
         private const string LOCAL_STORAGE_KEY = "token";
 
+        // ローカルストレージのJWTをもとに認証状態を取得する
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var tokenResult = await localStorage.GetAsync<string>(LOCAL_STORAGE_KEY);
@@ -27,14 +29,6 @@ namespace BlazorJwt.Web.Auth
             return new AuthenticationState(user);
         }
 
-        public async Task MarkUserAsAuthenticated(string token)
-        {
-            await localStorage.SetAsync(LOCAL_STORAGE_KEY, token);
-            var identity = GetClaimsIdentity(token);
-            var user = new ClaimsPrincipal(identity);
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
-        }
-
         private ClaimsIdentity GetClaimsIdentity(string token)
         {
             var handler = new JwtSecurityTokenHandler();
@@ -43,9 +37,21 @@ namespace BlazorJwt.Web.Auth
             return new ClaimsIdentity(claims, "jwt");
         }
 
+        // ログイン成功時にJWTを受け取り、ローカルストレージへJWTを書き込み認証状態を反映する。
+        public async Task MarkUserAsAuthenticated(string token)
+        {
+            await localStorage.SetAsync(LOCAL_STORAGE_KEY, token);
+            var identity = GetClaimsIdentity(token);
+            var user = new ClaimsPrincipal(identity);
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
+        }
+
+        // ログアウト時にローカルストレージのJWTを削除し、認証状態を反映する。
         public async Task MarkUserAsLoggedOut()
         {
             await localStorage.DeleteAsync(LOCAL_STORAGE_KEY);
+
+            // 認証者なしにする
             var identity = new ClaimsIdentity();
             var user = new ClaimsPrincipal(identity);
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
