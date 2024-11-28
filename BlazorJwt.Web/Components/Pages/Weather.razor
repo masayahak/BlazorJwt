@@ -2,7 +2,7 @@
 @using BlazorJwt.Api.Models
 @rendermode InteractiveServer
 @inject ApiClient ApiClient
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 
 <PageTitle>Weather</PageTitle>
@@ -67,7 +67,7 @@ else
     protected override async Task OnInitializedAsync()
     {        
         // 認証状態を取得
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var authState = await ((CustomAuthStateProvider)AuthStateProvider).GetAuthenticationStateAsync();
 
         // ロール
         var isAdmin = authState.User.IsInRole("admin");

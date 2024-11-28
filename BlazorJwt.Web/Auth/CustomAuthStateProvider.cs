@@ -18,8 +18,23 @@ namespace BlazorJwt.Web.Auth
         // ローカルストレージのJWTをもとに認証状態を取得する
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var tokenResult = await localStorage.GetAsync<string>(LOCAL_STORAGE_KEY);
-            string token = tokenResult.Value ?? string.Empty;
+            string token = string.Empty;
+            try
+            {
+                var tokenResult = await localStorage.GetAsync<string>(LOCAL_STORAGE_KEY);
+                token = tokenResult.Value ?? string.Empty;
+            }
+
+            // tokenの書き換えなどなんらかの異常を検知
+            catch (Exception ex)
+            {
+                try
+                {
+                    // ローカルストレージを消去
+                    await localStorage.DeleteAsync(LOCAL_STORAGE_KEY);
+                }
+                catch { }
+            }
 
             var identity = string.IsNullOrEmpty(token)
                 ? new ClaimsIdentity()
