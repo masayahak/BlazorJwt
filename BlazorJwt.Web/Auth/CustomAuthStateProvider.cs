@@ -26,7 +26,7 @@ namespace BlazorJwt.Web.Auth
             }
 
             // tokenの書き換えなどなんらかの異常を検知
-            catch (Exception ex)
+            catch (Exception)
             {
                 try
                 {
