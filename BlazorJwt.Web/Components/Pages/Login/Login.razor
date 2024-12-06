@@ -15,8 +15,7 @@
             <p>管理者権限でログイン     admin@test.com / admin</p>
             <p>ユーザー権限でログイン   user@test.com / user</p>
         </div>
-        <EditForm Model="loginModel" FormName="Login" OnValidSubmit="HandleLogin">
-            <DataAnnotationsValidator />
+        <EditForm Model="@loginModel" FormName="Login" OnValidSubmit="LoginAsync">
             <div class="form-group">
                 <label for="username">Username</label>
                 <InputText id="username" class="form-control" @bind-Value="loginModel.Username" />
@@ -32,7 +31,7 @@
 
 @code {
     private LoginModel loginModel = new LoginModel();
-    private async Task HandleLogin()
+    private async Task LoginAsync()
     {
         // ログイン用WebAPI呼び出し
         var token = await ApiClient.PostAsync<string, LoginModel>("/api/auth/login", loginModel);

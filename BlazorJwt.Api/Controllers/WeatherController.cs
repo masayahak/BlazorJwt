@@ -12,8 +12,6 @@ namespace BlazorJwt.Api.Controllers
         [HttpPost("all")]
         public async Task<ActionResult<WeatherModel[]>> All([FromBody] int ListCount)
         {
-            await Task.Delay(0);
-
             var startDate = DateOnly.FromDateTime(DateTime.Now);
             var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
             WeatherModel[] weathers = Enumerable.Range(1, ListCount).Select(index => new WeatherModel
@@ -22,6 +20,8 @@ namespace BlazorJwt.Api.Controllers
                 TemperatureC = Random.Shared.Next(-20, 55),
                 Summary = summaries[Random.Shared.Next(summaries.Length)]
             }).ToArray();
+
+            await Task.CompletedTask;
             return Ok(weathers);
         }
     }

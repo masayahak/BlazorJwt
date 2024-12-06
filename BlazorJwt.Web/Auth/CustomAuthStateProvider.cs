@@ -49,7 +49,7 @@ namespace BlazorJwt.Web.Auth
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
             var claims = jwtToken.Claims;
-            return new ClaimsIdentity(claims, "jwt");
+            return new ClaimsIdentity(claims, "jwt", ClaimTypes.Name, ClaimTypes.Role);
         }
 
         // ログイン成功時にJWTを受け取り、ローカルストレージへJWTを書き込み認証状態を反映する。

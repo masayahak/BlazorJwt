@@ -21,11 +21,11 @@
 
 
 @* 認証ユーザーロールに基づき判定するサンプル *@
-<AuthorizeView Roles="admin">
-    <p>権限:adminは @ROW_COUNT_ADMIN 件の天気予報を表示します。</p>
+<AuthorizeView Roles="Administrator">
+    <p>権限:Administratorは @ROW_COUNT_ADMIN 件の天気予報を表示します。</p>
 </AuthorizeView>
-<AuthorizeView Roles="user">
-    <p>権限:userは @ROW_COUNT_USER 件の天気予報を表示します。</p>
+<AuthorizeView Roles="User">
+    <p>権限:Userは @ROW_COUNT_USER 件の天気予報を表示します。</p>
 </AuthorizeView>
 
 
@@ -70,8 +70,8 @@ else
         var authState = await ((CustomAuthStateProvider)AuthStateProvider).GetAuthenticationStateAsync();
 
         // ロール
-        var isAdmin = authState.User.IsInRole("admin");
-        var isUser = authState.User.IsInRole("user");
+        var isAdmin = authState.User.IsInRole("Administrator");
+        var isUser = authState.User.IsInRole("User");
         var rowCount = isAdmin ? ROW_COUNT_ADMIN : isUser ? ROW_COUNT_USER : 0;
 
         // WebAPIコール

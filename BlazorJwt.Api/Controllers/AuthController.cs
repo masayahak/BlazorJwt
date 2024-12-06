@@ -14,8 +14,9 @@ namespace BlazorJwt.Api.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login([FromBody] LoginModel loginModel)
         {
-            await Task.Delay(0);
             var token = GenerateJwtToken(loginModel.Username, loginModel.Password);
+            await Task.CompletedTask;
+
             if (token != string.Empty)
             {
                 return Ok(token);
@@ -64,7 +65,7 @@ namespace BlazorJwt.Api.Controllers
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, userName),
-                    new Claim(ClaimTypes.Role, "admin")
+                    new Claim(ClaimTypes.Role, "Administrator")
                 };
                 return claims;
             }
@@ -73,7 +74,7 @@ namespace BlazorJwt.Api.Controllers
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, userName),
-                    new Claim(ClaimTypes.Role, "user")
+                    new Claim(ClaimTypes.Role, "User")
                 };
                 return claims;
             }
